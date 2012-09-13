@@ -1,0 +1,9 @@
+<style>
+.plugin * {
+	font-weight: 100;
+	box-sizing: border-box; }
+.plugin p, .plugin ul { 
+	font-size: 14px; }
+.plugin strong {
+	font-weight: bold; }
+</style>
