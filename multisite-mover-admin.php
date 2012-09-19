@@ -39,46 +39,64 @@
 	<h3>Additional Options</h3>
 	<ul>
 		<li><a href="#">Restore Upload Folder To Default Settings</a></li>
-		<li><a href="#">Regenerate Thumbnails</a></li>
+		<li><a id="regenerate" href="<?php echo $plugin_dir_path ?>">Regenerate Thumbnails</a></li>
 	</ul>
 </div>
 
 <script type="text/javascript">
 	jQuery(document).ready(function($){
-	
-	$('form').submit(function(e){
-		e.preventDefault();
-		$form = $(this);
 		var sites_refresh = Math.floor(Math.random()*10101);
-		//$form.find('input[type="submit"]').attr('disabled',true);
+		var site_path = '<?php echo ABSPATH; ?>';
 		
-		$.ajax({
-			url: "<?php echo site_url() . '/wp-content/plugins/custom-media-folder/app/get-sites.php?refresh='; ?>" + sites_refresh,
-			type: "POST",
-			data: $form.serialize()
-		}).done(function(json){
-			$.each(json.sites, function(i,site){
-				
-				var move_refresh = Math.floor(Math.random()*10101);
-				$.ajax({
-					url: "<?php echo site_url() . '/wp-content/plugins/custom-media-folder/app/multisite-move.php?refresh='; ?>" + move_refresh,
-					type: "POST",
-					data: { 
-						'blog_id'				:site.blog_id,
-						'blog_path'			:site.blog_path,
-						'blog_cmf_path'	:site.blog_cmf_path, 
-						'site_path' :$form.find('input[name="site_path"]').val(),
-						'cmf_path'	:$form.find('input[name="cmf_path"]').val() }
-				}).done(function(html){
-					
-					$('#move-results').append('<li>Images moved to ' + html + ' &#x2713;</li>');	
-				});
-				
+		$('#regenerate').click(function(e){
+			e.preventDefault();
+			
+			$.ajax({
+				url: "<?php echo site_url() . '/wp-content/plugins/custom-media-folder/app/regenerate-thumbnails.php?refresh='; ?>" + sites_refresh,
+				type: "GET",
+				data: {'site_path':site_path},
+				dataType: 'JSON'
+			}).done(function(json) { 
+				if(json.success) {
+					alert(json.msg);
+				}
 			});
-			//$form.find('input[type="submit"]').attr('disabled',false);
+			
 		});
 		
-	});
+		$('form').submit(function(e){
+			e.preventDefault();
+			$form = $(this);
+			var sites_refresh = Math.floor(Math.random()*10101);
+			//$form.find('input[type="submit"]').attr('disabled',true);
+			
+			$.ajax({
+				url: "<?php echo site_url() . '/wp-content/plugins/custom-media-folder/app/get-sites.php?refresh='; ?>" + sites_refresh,
+				type: "POST",
+				data: $form.serialize()
+			}).done(function(json){
+				$.each(json.sites, function(i,site){
+					
+					var move_refresh = Math.floor(Math.random()*10101);
+					$.ajax({
+						url: "<?php echo site_url() . '/wp-content/plugins/custom-media-folder/app/multisite-move.php?refresh='; ?>" + move_refresh,
+						type: "POST",
+						data: { 
+							'blog_id'				:site.blog_id,
+							'blog_path'			:site.blog_path,
+							'blog_cmf_path'	:site.blog_cmf_path, 
+							'site_path' :$form.find('input[name="site_path"]').val(),
+							'cmf_path'	:$form.find('input[name="cmf_path"]').val() }
+					}).done(function(html){
+						
+						$('#move-results').append('<li>Images moved to ' + html + ' &#x2713;</li>');	
+					});
+					
+				});
+				//$form.find('input[type="submit"]').attr('disabled',false);
+			});
+			
+		});
 	
 	});
 </script>
